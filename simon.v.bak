@@ -1,0 +1,298 @@
+
+module simon(input CLOCK_50, output [6:0] HEX0, output [6:0] HEX1, output [6:0] HEX2, output [6:0] HEX3,
+	output [6:0] HEX4, output [6:0] HEX5, input [3:0] KEY, output [9:0] LEDR, input [9:0] SW);
+
+
+//=======================================================
+//  REG/WIRE declarations
+//=======================================================
+	
+	// Resetovanie všetkých led pri on off a pri zmene levelu
+	// Zredukovanie počtu zbytočných registrov
+	// Presunutie určitých modulov do funkcii ak sú repetetívne
+	
+	wire 	half_sec;
+	wire [1:8] random_number;
+	wire reset;
+
+	reg [1:0] NO_LED_DELAY;
+	reg [1:0] IS_PRESSED;
+	reg [1:8] MODULATED_RANDOM;
+	reg [1:0] SHOW_LEVEL;
+	reg [1:0] SHOW_TIMER;
+	reg [9:0] LEDS;
+	
+	reg [1:0] SAVED_ORDER[0:9]; // 10 x 2 bits
+	
+	/* 
+	STATUS:
+			000 - Loading
+			001 - Generating game
+			010 - Waiting for timer start
+			011 - Timer was started, waiting for player input
+			100 - FAIL
+			111 - OK
+	*/
+	
+	reg [3:0] STATUS;
+	
+	reg [3:0] SEGMENT1;
+	reg [3:0] SEGMENT2;
+	reg [3:0] SEGMENT3;
+	reg [3:0] SEGMENT4;
+	
+	/*
+	LEVELS:
+		(LEVEL 01 - 04) -> 4x - 17s - 3x delay
+		(LEVEL 05 - 09) -> 5x - 15s - 3x delay
+		(LEVEL 10 - 14) -> 6x - 13s - 2x delay
+		(LEVEL 15 - 19) -> 7x - 11s - 2x delay
+		(LEVEL 20 - 24) -> 8x - 09s - 1x delay
+		(LEVEL 25 - 29) -> 9x - 07s - 1x delay
+		(LEVEL 30 - Infinity) -> 10x - 05s - 1x delay	
+	*/
+	
+	integer LEVEL;
+	integer TIME;
+	integer SAVED_COUNTER;
+	integer LOADED_COUNTER;
+	integer GAME_DELAY;
+	
+	assign reset = SW[0];
+	assign LEDR[9:0] = LEDS[9:0];
+	
+	divider divider_half_sec
+	(
+		.clk(CLOCK_50),
+		.reset(reset),
+		.result(half_sec)
+	);
+
+	lfsr random_generator
+	(
+		.clk(CLOCK_50),
+		.reset(reset),
+		.result(random_number)
+	);
+	
+	segment segment_part1 (SEGMENT1[3:0], HEX0);
+	segment segment_part2 (SEGMENT2[3:0], HEX1);
+	segment segment_part3 (SEGMENT3[3:0], HEX2);
+	segment segment_part4 (SEGMENT4[3:0], HEX3);
+	
+	// Disabled parts
+	segment segment_part5 (4'hF, HEX4);
+	segment segment_part6 (4'hF, HEX5);
+	
+	always@(posedge CLOCK_50) begin
+
+		if(SW[0] == 0) begin // Reset
+			NO_LED_DELAY = 'b0;
+				
+			// Reseting level
+			LEVEL <= 'd0;
+			STATUS <= 'b000;
+			SAVED_COUNTER = 'd0;
+			GAME_DELAY <= 'd0;
+			
+			// Reseting variables
+			SHOW_LEVEL <= 'b1;
+			SHOW_TIMER <= 'b0;
+			
+			// Clearing all segments
+			SEGMENT1[3:0] <= 4'hF;
+			SEGMENT2[3:0] <= 4'hF;
+			SEGMENT3[3:0] <= 4'hF;
+			SEGMENT4[3:0] <= 4'hF;
+			
+			// Reseting leds
+			LEDS[3:0] <= 'b0000;
+		end
+		else if(STATUS == 'b100) begin // Fail
+			SEGMENT1[3:0] <= 4'hd; // Letter F
+			SEGMENT2[3:0] <= 4'hC; // Letter A
+			SEGMENT3[3:0] <= 4'hb; // Letter I
+			SEGMENT4[3:0] <= 4'hA; // Letter L
+		end
+		else if(SHOW_LEVEL == 'b1) begin // Runung showing level
+			SEGMENT1[3:0] <= LEVEL % 'd10;
+			SEGMENT2[3:0] <= (LEVEL / 'd10) % 'd10;
+			SEGMENT3[3:0] <= 4'hd; // Letter L
+			SEGMENT4[3:0] <= 4'hF; // Disabled 7-segment
+		end
+		else if(SHOW_TIMER == 'b1) begin
+			SEGMENT1[3:0] <= TIME % 'd10;
+			SEGMENT2[3:0] <= (TIME / 'd10) % 'd10;
+			SEGMENT3[3:0] <= 4'hF; // Disabled 7-segment
+			SEGMENT4[3:0] <= 4'hF; // Disabled 7-segment
+		end
+		
+		if(IS_PRESSED != 'b0 && KEY[0] != 0 && KEY[1] != 0 && KEY[2] != 0 && KEY[3] != 0) begin
+			IS_PRESSED <= 'b0;
+			LEDS[3:0] <= 'b0000;
+		end
+		
+		if(IS_PRESSED == 'b0 && STATUS == 'b011) begin
+
+			if(KEY[0] == 0) begin
+				IS_PRESSED <= 'b1;
+				if(SAVED_ORDER[LOADED_COUNTER] == 'b00) begin
+					LOADED_COUNTER <= LOADED_COUNTER + 'd1;
+					LEDS[0] <= 1;
+				end
+				else begin
+					STATUS <= 'b100;
+					GAME_DELAY <= 'd3;
+				end
+			end
+			else if(KEY[1] == 0) begin
+				IS_PRESSED <= 'b1;
+				if(SAVED_ORDER[LOADED_COUNTER] == 'b01) begin
+					LOADED_COUNTER <= LOADED_COUNTER + 'd1;
+					LEDS[1] <= 1;
+				end
+				else begin
+					STATUS <= 'b100;
+					GAME_DELAY <= 'd3;
+				end
+			end
+			else if(KEY[2] == 0) begin
+				IS_PRESSED <= 'b1;
+				if(SAVED_ORDER[LOADED_COUNTER] == 'b10) begin
+					LOADED_COUNTER <= LOADED_COUNTER + 'd1;
+					LEDS[2] <= 1;
+				end
+				else begin
+					STATUS <= 'b100;
+					GAME_DELAY <= 'd3;
+				end
+			end
+			else if(KEY[3] == 0) begin
+				IS_PRESSED <= 'b1;
+				if(SAVED_ORDER[LOADED_COUNTER] == 'b11) begin
+					LOADED_COUNTER <= LOADED_COUNTER + 'd1;
+					LEDS[3] <= 1;
+				end
+				else begin
+					STATUS <= 'b100;
+					GAME_DELAY <= 'd3;
+				end
+			end
+			if(LOADED_COUNTER >= SAVED_COUNTER) begin
+				STATUS <= 'b111;
+				GAME_DELAY <= 'd1;
+			end	
+		end
+		
+		if(STATUS == 'b010) begin
+			TIME <= 'd17 - ((LEVEL / 'd5) * 'd2);
+			SHOW_LEVEL <= 'b0;
+			SHOW_TIMER <= 'b1;
+			STATUS <= 'b011;
+			LOADED_COUNTER <= 'd0;
+		end
+		
+		if(STATUS == 'b011 && TIME <= 'd0) begin
+			STATUS <= 'b100;
+			GAME_DELAY <= 'd4;
+		end
+		
+		if(half_sec) begin // Every 0.5 sec.
+			if(STATUS == 'b000) begin
+				if(LEDS[3:0] == 'b1111) begin
+					LEVEL <= LEVEL + 1;
+					LEDS[3:0] <= 'b0000;
+					STATUS <= 'b001;
+				end 
+				else begin
+					LEDS <= LEDS << 1;
+					LEDS[0] <= 1;
+				end
+			end
+			else if(STATUS == 'b001) begin
+				if(NO_LED_DELAY == 'b1) LEDS[3:0] <= 'b0000; // Reseting leds
+				
+				if(GAME_DELAY <= 'd0 && NO_LED_DELAY == 'b0) begin
+					
+					GAME_DELAY <= 'd3 - (LEVEL / 'd10);
+					NO_LED_DELAY <= 'b1;
+					
+					if(SAVED_COUNTER < ((LEVEL / 5) + 'd4)) begin
+					
+						// Getting modulated value from random
+						MODULATED_RANDOM[1:8] <= random_number[1:8] % 'd4; 
+						
+						if(MODULATED_RANDOM == 'd1) begin
+							LEDS[0] <= 1;
+							SAVED_ORDER[SAVED_COUNTER] <= 'b00;
+						end
+						else if(MODULATED_RANDOM == 'd2) begin
+							LEDS[1] <= 1;
+							SAVED_ORDER[SAVED_COUNTER] <= 'b01;
+						end
+						else if(MODULATED_RANDOM == 'd3) begin
+							LEDS[2] <= 1;
+							SAVED_ORDER[SAVED_COUNTER] <= 'b10;
+						end
+						else begin
+							LEDS[3] <= 1;
+							SAVED_ORDER[SAVED_COUNTER] <= 'b11;
+						end
+						SAVED_COUNTER <= SAVED_COUNTER + 'd1;
+					end
+					else begin
+						STATUS <= 'b010;
+					end
+				end
+				else begin
+					NO_LED_DELAY <= 'b0;
+					GAME_DELAY <= GAME_DELAY - 'd1;
+				end
+			end
+			else if(STATUS == 'b011) begin
+				if(GAME_DELAY <= 'd0) begin
+					TIME <= TIME - 'd1;
+					GAME_DELAY <= 'd2;
+				end
+				else begin
+					GAME_DELAY <= GAME_DELAY - 'd1;
+				end
+			end
+			else if(STATUS == 'b100) begin
+				if(GAME_DELAY <= 'd0) begin
+					STATUS <= 'b011;
+					
+					NO_LED_DELAY = 'b0;
+				
+					// Reseting level
+					LEVEL <= 'd0;
+					STATUS <= 'b000;
+					SAVED_COUNTER = 'd0;
+					
+					// Reseting variables
+					SHOW_LEVEL <= 'b1;
+					SHOW_TIMER <= 'b0;
+					
+					// Reseting leds
+					LEDS[3:0] <= 'b0000;
+				end
+				else begin
+					GAME_DELAY <= GAME_DELAY - 'd1;
+				end
+			end
+			else if(STATUS == 'b111) begin
+				if(GAME_DELAY <= 'd0) begin
+					STATUS <= 'b000;
+					SAVED_COUNTER <= 'd0;
+					SHOW_LEVEL <= 'b1;
+					SHOW_TIMER <= 'b0;
+					NO_LED_DELAY <= 'b0;
+					GAME_DELAY <= 'd0;
+				end
+				else begin
+					GAME_DELAY <= GAME_DELAY - 'd1;
+				end
+			end
+		end
+	end
+endmodule

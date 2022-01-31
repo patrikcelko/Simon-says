@@ -1,0 +1,227 @@
+|simon
+CLOCK_50 => CLOCK_50.IN2
+HEX0[0] <= segment:segment_part1.port1
+HEX0[1] <= segment:segment_part1.port1
+HEX0[2] <= segment:segment_part1.port1
+HEX0[3] <= segment:segment_part1.port1
+HEX0[4] <= segment:segment_part1.port1
+HEX0[5] <= segment:segment_part1.port1
+HEX0[6] <= segment:segment_part1.port1
+HEX1[0] <= segment:segment_part2.port1
+HEX1[1] <= segment:segment_part2.port1
+HEX1[2] <= segment:segment_part2.port1
+HEX1[3] <= segment:segment_part2.port1
+HEX1[4] <= segment:segment_part2.port1
+HEX1[5] <= segment:segment_part2.port1
+HEX1[6] <= segment:segment_part2.port1
+HEX2[0] <= segment:segment_part3.port1
+HEX2[1] <= segment:segment_part3.port1
+HEX2[2] <= segment:segment_part3.port1
+HEX2[3] <= segment:segment_part3.port1
+HEX2[4] <= segment:segment_part3.port1
+HEX2[5] <= segment:segment_part3.port1
+HEX2[6] <= segment:segment_part3.port1
+HEX3[0] <= segment:segment_part4.port1
+HEX3[1] <= segment:segment_part4.port1
+HEX3[2] <= segment:segment_part4.port1
+HEX3[3] <= segment:segment_part4.port1
+HEX3[4] <= segment:segment_part4.port1
+HEX3[5] <= segment:segment_part4.port1
+HEX3[6] <= segment:segment_part4.port1
+HEX4[0] <= segment:segment_part5.port1
+HEX4[1] <= segment:segment_part5.port1
+HEX4[2] <= segment:segment_part5.port1
+HEX4[3] <= segment:segment_part5.port1
+HEX4[4] <= segment:segment_part5.port1
+HEX4[5] <= segment:segment_part5.port1
+HEX4[6] <= segment:segment_part5.port1
+HEX5[0] <= segment:segment_part6.port1
+HEX5[1] <= segment:segment_part6.port1
+HEX5[2] <= segment:segment_part6.port1
+HEX5[3] <= segment:segment_part6.port1
+HEX5[4] <= segment:segment_part6.port1
+HEX5[5] <= segment:segment_part6.port1
+HEX5[6] <= segment:segment_part6.port1
+KEY[0] => always0.IN0
+KEY[0] => Mux0.IN3
+KEY[0] => always0.IN0
+KEY[1] => always0.IN1
+KEY[1] => Mux0.IN2
+KEY[1] => always0.IN1
+KEY[2] => always0.IN1
+KEY[2] => Mux0.IN1
+KEY[2] => always0.IN1
+KEY[3] => always0.IN1
+KEY[3] => Mux0.IN0
+KEY[3] => always0.IN1
+LEDR[0] <= LEDS[0].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[1] <= LEDS[1].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[2] <= LEDS[2].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[3] <= LEDS[3].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[4] <= LEDS[4].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[5] <= LEDS[5].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[6] <= LEDS[6].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[7] <= LEDS[7].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[8] <= LEDS[8].DB_MAX_OUTPUT_PORT_TYPE
+LEDR[9] <= LEDS[9].DB_MAX_OUTPUT_PORT_TYPE
+SW[0] => reset.IN2
+SW[1] => ~NO_FANOUT~
+SW[2] => ~NO_FANOUT~
+SW[3] => ~NO_FANOUT~
+SW[4] => ~NO_FANOUT~
+SW[5] => ~NO_FANOUT~
+SW[6] => ~NO_FANOUT~
+SW[7] => ~NO_FANOUT~
+SW[8] => ~NO_FANOUT~
+SW[9] => ~NO_FANOUT~
+
+
+|simon|divider:divider_half_sec
+clk => CLK_DIV.CLK
+clk => CNTR[0].CLK
+clk => CNTR[1].CLK
+clk => CNTR[2].CLK
+clk => CNTR[3].CLK
+clk => CNTR[4].CLK
+clk => CNTR[5].CLK
+clk => CNTR[6].CLK
+clk => CNTR[7].CLK
+clk => CNTR[8].CLK
+clk => CNTR[9].CLK
+clk => CNTR[10].CLK
+clk => CNTR[11].CLK
+clk => CNTR[12].CLK
+clk => CNTR[13].CLK
+clk => CNTR[14].CLK
+clk => CNTR[15].CLK
+clk => CNTR[16].CLK
+clk => CNTR[17].CLK
+clk => CNTR[18].CLK
+clk => CNTR[19].CLK
+clk => CNTR[20].CLK
+clk => CNTR[21].CLK
+clk => CNTR[22].CLK
+clk => CNTR[23].CLK
+clk => CNTR[24].CLK
+clk => CNTR[25].CLK
+clk => CNTR[26].CLK
+clk => CNTR[27].CLK
+clk => CNTR[28].CLK
+clk => CNTR[29].CLK
+clk => CNTR[30].CLK
+clk => CNTR[31].CLK
+reset => always0.IN1
+result <= CLK_DIV.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|simon|lfsr:random_generator
+clk => QUEUE_OUT[8].CLK
+clk => QUEUE_OUT[7].CLK
+clk => QUEUE_OUT[6].CLK
+clk => QUEUE_OUT[5].CLK
+clk => QUEUE_OUT[4].CLK
+clk => QUEUE_OUT[3].CLK
+clk => QUEUE_OUT[2].CLK
+clk => QUEUE_OUT[1].CLK
+reset => QUEUE_OUT.OUTPUTSELECT
+reset => QUEUE_OUT.OUTPUTSELECT
+reset => QUEUE_OUT.OUTPUTSELECT
+reset => QUEUE_OUT.OUTPUTSELECT
+reset => QUEUE_OUT.OUTPUTSELECT
+reset => QUEUE_OUT.OUTPUTSELECT
+reset => QUEUE_OUT.OUTPUTSELECT
+reset => QUEUE_OUT.OUTPUTSELECT
+result[8] <= QUEUE_OUT[8].DB_MAX_OUTPUT_PORT_TYPE
+result[7] <= QUEUE_OUT[7].DB_MAX_OUTPUT_PORT_TYPE
+result[6] <= QUEUE_OUT[6].DB_MAX_OUTPUT_PORT_TYPE
+result[5] <= QUEUE_OUT[5].DB_MAX_OUTPUT_PORT_TYPE
+result[4] <= QUEUE_OUT[4].DB_MAX_OUTPUT_PORT_TYPE
+result[3] <= QUEUE_OUT[3].DB_MAX_OUTPUT_PORT_TYPE
+result[2] <= QUEUE_OUT[2].DB_MAX_OUTPUT_PORT_TYPE
+result[1] <= QUEUE_OUT[1].DB_MAX_OUTPUT_PORT_TYPE
+
+
+|simon|segment:segment_part1
+data[0] => Decoder0.IN3
+data[1] => Decoder0.IN2
+data[2] => Decoder0.IN1
+data[3] => Decoder0.IN0
+seg[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+seg[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+seg[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+seg[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+seg[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+seg[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+seg[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|simon|segment:segment_part2
+data[0] => Decoder0.IN3
+data[1] => Decoder0.IN2
+data[2] => Decoder0.IN1
+data[3] => Decoder0.IN0
+seg[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+seg[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+seg[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+seg[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+seg[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+seg[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+seg[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|simon|segment:segment_part3
+data[0] => Decoder0.IN3
+data[1] => Decoder0.IN2
+data[2] => Decoder0.IN1
+data[3] => Decoder0.IN0
+seg[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+seg[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+seg[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+seg[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+seg[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+seg[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+seg[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|simon|segment:segment_part4
+data[0] => Decoder0.IN3
+data[1] => Decoder0.IN2
+data[2] => Decoder0.IN1
+data[3] => Decoder0.IN0
+seg[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+seg[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+seg[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+seg[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+seg[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+seg[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+seg[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|simon|segment:segment_part5
+data[0] => Decoder0.IN3
+data[1] => Decoder0.IN2
+data[2] => Decoder0.IN1
+data[3] => Decoder0.IN0
+seg[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+seg[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+seg[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+seg[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+seg[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+seg[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+seg[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
+|simon|segment:segment_part6
+data[0] => Decoder0.IN3
+data[1] => Decoder0.IN2
+data[2] => Decoder0.IN1
+data[3] => Decoder0.IN0
+seg[0] <= WideOr6.DB_MAX_OUTPUT_PORT_TYPE
+seg[1] <= WideOr5.DB_MAX_OUTPUT_PORT_TYPE
+seg[2] <= WideOr4.DB_MAX_OUTPUT_PORT_TYPE
+seg[3] <= WideOr3.DB_MAX_OUTPUT_PORT_TYPE
+seg[4] <= WideOr2.DB_MAX_OUTPUT_PORT_TYPE
+seg[5] <= WideOr1.DB_MAX_OUTPUT_PORT_TYPE
+seg[6] <= WideOr0.DB_MAX_OUTPUT_PORT_TYPE
+
+
